@@ -2,8 +2,8 @@ package sfexpress
 
 import (
 	"github.com/go-resty/resty/v2"
-	"sfexpress/config"
-	"sfexpress/tool"
+	"github.com/zengweigg/sfexpress/config"
+	"github.com/zengweigg/sfexpress/tool"
 )
 
 type service struct {
@@ -13,13 +13,12 @@ type service struct {
 }
 
 type services struct {
-	Authorization authorizationService // 认证
-	Iecs          iecsService
-	Iuop          iuopService
-	Ioms          iomsService
-	Ades          adesservice
-	Gts           gtsService
-	Icms          icmsService
+	Iecs iecsService
+	Iuop iuopService
+	Ioms iomsService
+	Ades adesservice
+	Gts  gtsService
+	Icms icmsService
 }
 
 // GetSign 消息加密获取签名

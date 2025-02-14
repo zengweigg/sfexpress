@@ -1,7 +1,7 @@
 package sfexpress
 
 import (
-	"sfexpress/model"
+	"github.com/zengweigg/sfexpress/model"
 )
 
 type iecsService service

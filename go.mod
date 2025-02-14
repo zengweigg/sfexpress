@@ -1,4 +1,4 @@
-module sfexpress
+module github.com/zengweigg/sfexpress
 
 go 1.23.5
 

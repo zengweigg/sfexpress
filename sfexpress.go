@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-resty/resty/v2"
+	"github.com/hiscaler/gox/bytex"
+	jsoniter "github.com/json-iterator/go"
+	"github.com/zengweigg/sfexpress/config"
+	"github.com/zengweigg/sfexpress/model"
 	"net/http"
-	"sfexpress/config"
-	"sfexpress/model"
+	"strconv"
 	"time"
 )
 
@@ -40,15 +43,79 @@ func NewSFService(cfg config.Config) *SFClient {
 			"Content-Type": "application/json",
 			"Accept":       "application/json",
 			"User-Agent":   userAgent,
-			"lang":         "zh-CN",
 		})
 	if cfg.Sandbox {
-		httpClient.SetBaseURL("http://api-ifsp-sit.sf.global")
+		httpClient.SetBaseURL("http://api-ifsp-sit.sf.global/openapi/api/dispatch")
 	} else {
-		httpClient.SetBaseURL("https://api-ifsp.sf.global")
+		httpClient.SetBaseURL("https://api-ifsp.sf.global/openapi/api/dispatch")
 	}
+	var tempToken string
 	httpClient.
 		SetTimeout(time.Duration(cfg.Timeout) * time.Second).
+		OnBeforeRequest(func(client *resty.Client, request *resty.Request) error {
+			// 获取token
+			ft := FileToken{}
+			var tokenWriterReader TokenWriterReader = ft
+			tokens, err := tokenWriterReader.GetValidAccessToken(cfg.APIKey, cfg.APISecret, cfg.Lang, cfg.Debug, cfg.Sandbox)
+			if err != nil {
+				return err
+			}
+			tempToken = tokens.AccessToken
+			// 获取签名
+			param := "{}"
+			if request.Body != nil {
+				bd, e := jsoniter.Marshal(request.Body)
+				if e != nil {
+					return e
+				}
+				param = string(bd)
+			}
+			timestamp := strconv.FormatInt(time.Now().UnixMicro(), 10)
+			p, err := GetSign(param, tempToken, cfg.EncodingAesKey, cfg.APIKey, timestamp)
+			if err != nil {
+				return err
+			}
+			request.SetHeaders(map[string]string{
+				"msgType":   request.URL,
+				"appKey":    cfg.APIKey,
+				"token":     tempToken,
+				"timestamp": timestamp,
+				"nonce":     timestamp,
+				"signature": p.Signature,
+				"lang":      "zh-CN",
+			})
+			request.SetBody(p.Encrypt)
+			request.URL = ""
+			return nil
+		}).
+		OnAfterResponse(func(client *resty.Client, response *resty.Response) (err error) {
+			if response.IsError() {
+				return fmt.Errorf("%s: %s", response.Status(), bytex.ToString(response.Body()))
+			}
+			contentType := response.RawResponse.Header.Get("Content-Type")
+			if contentType == "application/octet-stream" {
+				return
+			}
+			r := model.SFResponse{}
+			if err = jsoniter.Unmarshal(response.Body(), &r); err == nil {
+				if r.ApiResultCode != 0 {
+					return fmt.Errorf("%d: %s", r.ApiResultCode, r.ApiErrorMsg)
+				}
+				//  自定义响应数据
+				if r.ApiResultData != "" {
+					ok, err := DecodeMsg(r.ApiResultData, tempToken, cfg.EncodingAesKey, cfg.APIKey)
+					if err == nil {
+						response.SetBody([]byte(ok))
+					}
+				}
+			} else {
+				SFClient.logger.Errorf("JSON Unmarshal error: %s", err.Error())
+			}
+			if err != nil {
+				SFClient.logger.Errorf("OnAfterResponse error: %s", err.Error())
+			}
+			return
+		}).
 		SetRetryCount(2).
 		SetRetryWaitTime(5 * time.Second).
 		SetRetryMaxWaitTime(10 * time.Second).
@@ -74,7 +141,7 @@ func NewSFService(cfg config.Config) *SFClient {
 			// 解析响应体JSON
 			var responseBody ResponseBody
 			if err := json.Unmarshal(r.Body(), &responseBody); err != nil {
-				text += fmt.Sprintf(", error: %d", string(r.Body()))
+				text += fmt.Sprintf(", error: %s", string(r.Body()))
 				SFClient.logger.Debugf("Retry request: %s", text)
 				return true // 如果解析错误则重试
 			}
@@ -94,7 +161,6 @@ func NewSFService(cfg config.Config) *SFClient {
 		httpClient: SFClient.httpClient,
 	}
 	SFClient.Services = services{
-		Authorization: (authorizationService)(xService),
 		//Iecs:          (iecsService)(xService),
 		//Iuop:          (iuopService)(xService),
 		//Ioms:          (iomsService)(xService),
@@ -103,26 +169,4 @@ func NewSFService(cfg config.Config) *SFClient {
 		Icms: (icmsService)(xService),
 	}
 	return SFClient
-}
-
-func main() {
-	cfg := config.LoadConfig()
-	sfClient := NewSFService(*cfg)
-	tok, err := sfClient.Services.Authorization.GetToken()
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		return
-	}
-	fmt.Printf("Token created successfully: %+v\n", tok.AccessToken)
-	postData := model.SFICMSQueryCityList{
-		CountryCode:  "CN",
-		RegionFirst:  "guangdong",
-		RegionSecond: "Chaozhou",
-	}
-	resp, err := sfClient.Services.Icms.GetCityList(postData)
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		return
-	}
-	fmt.Println(resp.Data)
 }
