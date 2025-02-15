@@ -6,6 +6,8 @@ import (
 	"github.com/zengweigg/sfexpress/model"
 )
 
+// 国际区域划分
+
 type icmsService service
 
 // GetContinentList 查询大洲列表

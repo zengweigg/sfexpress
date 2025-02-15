@@ -161,13 +161,12 @@ func NewSFService(cfg config.Config) *SFClient {
 		httpClient: SFClient.httpClient,
 	}
 	SFClient.Services = services{
-		Iecs: (iecsService)(xService),
-		//Iuop:          (iuopService)(xService),
-		//Ioms:          (iomsService)(xService),
+		Iecs: (iecsService)(xService), // 出口电商业务场景
+		//Iuop:          (iuopService)(xService), //  国际快递业务场景接入
 		//Ades:          (adesservice)(xService),
-		//Gts:           (gtsService)(xService),
-		Icms: (icmsService)(xService),
-		Icsm: (icsmService)(xService),
+		Gts:  (gtsService)(xService),  // 通用查询
+		Icms: (icmsService)(xService), // 国际区划
+		Icsm: (icsmService)(xService), // 关务发票
 	}
 	return SFClient
 }
