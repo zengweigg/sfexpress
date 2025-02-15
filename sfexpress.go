@@ -161,12 +161,13 @@ func NewSFService(cfg config.Config) *SFClient {
 		httpClient: SFClient.httpClient,
 	}
 	SFClient.Services = services{
-		//Iecs:          (iecsService)(xService),
+		Iecs: (iecsService)(xService),
 		//Iuop:          (iuopService)(xService),
 		//Ioms:          (iomsService)(xService),
 		//Ades:          (adesservice)(xService),
 		//Gts:           (gtsService)(xService),
 		Icms: (icmsService)(xService),
+		Icsm: (icsmService)(xService),
 	}
 	return SFClient
 }

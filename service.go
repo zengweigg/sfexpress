@@ -19,6 +19,7 @@ type services struct {
 	Ades adesservice
 	Gts  gtsService
 	Icms icmsService
+	Icsm icsmService
 }
 
 // GetSign 消息加密获取签名
