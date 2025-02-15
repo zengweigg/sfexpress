@@ -7,6 +7,7 @@ require (
 	github.com/hiscaler/gox v0.0.0-20240824093629-11ab6f7acd0b
 	github.com/json-iterator/go v1.1.12
 	golang.org/x/net v0.33.0
+	gopkg.in/guregu/null.v4 v4.0.0
 )
 
 require (
