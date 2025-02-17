@@ -1,7 +1,6 @@
 package sfexpress
 
 import (
-	"fmt"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/zengweigg/sfexpress/model"
 )
@@ -18,7 +17,6 @@ func (s iecsService) CreateOrder(postData model.IECSCreateOrderPost) (model.IECS
 	resp, err := s.httpClient.R().
 		SetBody(postData).
 		Post("IECS_CREATE_ORDER")
-	fmt.Println(string(resp.Body()))
 	if err != nil {
 		return respData, err
 	}
@@ -37,7 +35,6 @@ func (s iecsService) PrintOrder(postData model.IECSPrintOrderPost) (model.IECSPr
 	resp, err := s.httpClient.R().
 		SetBody(postData).
 		Post("IECS_PRINT_ORDER")
-	fmt.Println(string(resp.Body()))
 	if err != nil {
 		return respData, err
 	}
@@ -56,7 +53,6 @@ func (s iecsService) ImportPackage(postData model.IECSImportPackagePost) (model.
 	resp, err := s.httpClient.R().
 		SetBody(postData).
 		Post("IECS_IMPORT_PACKAGE")
-	fmt.Println(string(resp.Body()))
 	if err != nil {
 		return respData, err
 	}
@@ -75,7 +71,6 @@ func (s iecsService) QueryWeightFreight(postData model.IECSQueryWeightFreightPos
 	resp, err := s.httpClient.R().
 		SetBody(postData).
 		Post("IECS_QUERY_WEIGHT_FREIGHT")
-	fmt.Println(string(resp.Body()))
 	if err != nil {
 		return respData, err
 	}
@@ -94,7 +89,6 @@ func (s iecsService) UploadWeight(postData model.IECSUploadWeightPost) (model.SF
 	resp, err := s.httpClient.R().
 		SetBody(postData).
 		Post("IECS_UPLOAD_WEIGHT")
-	fmt.Println(string(resp.Body()))
 	if err != nil {
 		return respData, err
 	}
@@ -113,7 +107,6 @@ func (s iecsService) QueryAgentno(postData model.IECSQueryAgentnoPost) (model.IE
 	resp, err := s.httpClient.R().
 		SetBody(postData).
 		Post("IECS_QUERY_AGENTNO")
-	fmt.Println(string(resp.Body()))
 	if err != nil {
 		return respData, err
 	}
@@ -132,7 +125,6 @@ func (s iecsService) CancelOrder(postData model.IECSCancelOrderPost) (model.SFAp
 	resp, err := s.httpClient.R().
 		SetBody(postData).
 		Post("IECS_CANCEL_ORDER")
-	fmt.Println(string(resp.Body()))
 	if err != nil {
 		return respData, err
 	}
@@ -151,7 +143,6 @@ func (s iecsService) OrderIntercept(postData model.IECSOrderInterceptPost) (mode
 	resp, err := s.httpClient.R().
 		SetBody(postData).
 		Post("IECS_ORDER_INTERCEPT")
-	fmt.Println(string(resp.Body()))
 	if err != nil {
 		return respData, err
 	}
@@ -170,7 +161,6 @@ func (s iecsService) QueryPod(postData model.IECSQueryPodPost) (model.IECSQueryP
 	resp, err := s.httpClient.R().
 		SetBody(postData).
 		Post("IECS_QUERY_POD")
-	fmt.Println(string(resp.Body()))
 	if err != nil {
 		return respData, err
 	}

@@ -51,6 +51,18 @@ type SenderInfo struct {
 	Email        null.String `json:"email"`        // 11. 寄件方邮箱 (非必填)
 }
 
+type SenderInfo2 struct {
+	SenderInfo
+	TelAreaCode   string `json:"telAreaCode"`   // 寄件方固定电话区号
+	PhoneAreaCode string `json:"phoneAreaCode"` // 寄件方移动电话区号
+	CargoType     int    `json:"cargoType"`     // 寄件方货物类型：1-个人件；2-公司件
+	CertType      string `json:"certType"`      // 寄件方证件类型 详细参考附录字典
+	CertCardNo    string `json:"certCardNo"`    // 寄件方证件号
+	Vat           string `json:"vat"`           // 寄件方VAT号
+	Eori          string `json:"eori"`          // 寄件方EORI号
+	IossNo        string `json:"iossNo"`        // 寄件方IOSS号
+}
+
 type ReceiverInfo struct {
 	Company       string      `json:"company"`       // 1. 收件方公司 (必填)
 	Contact       string      `json:"contact"`       // 2. 收件方姓名 (必填)
@@ -67,6 +79,19 @@ type ReceiverInfo struct {
 	DestDoorplate null.String `json:"destDoorplate"` // 13. 到方门牌号，德国必填 (非必填)
 }
 
+type ReceiverInfo2 struct {
+	ReceiverInfo
+	RegionFifth string `json:"regionFifth"` // 收件方地址五级区划（道路名，收件方国家为韩国，则必填，长度100）
+	RegionSixth string `json:"regionSixth"` // 收件方地址六级区划（建筑编号，收件方国家为韩国，则必填）
+	TelAreaCode string `json:"telAreaCode"` // 收件方固定电话区号
+	CargoType   int    `json:"cargoType"`   // 收件方货物类型：1-个人件；2-公司件
+	CertType    string `json:"certType"`    // 收件方证件类型 详细参考附录字典
+	CertCardNo  string `json:"certCardNo"`  // 收件方证件号
+	Vat         string `json:"vat"`         // 收件方VAT号
+	Eori        string `json:"eori"`        // 收件方EORI号
+}
+
+// 报关信息
 type CustomsInfo struct {
 	PassportId null.String `json:"passportId"` // 1. 韩国个人清关代码，如P561140689980，只接受英文和数字 专线小包韩国流向为必填 (非必填)
 	Category   null.String `json:"category"`   // 2. 订单所属品类，用于海关清关 (非必填)

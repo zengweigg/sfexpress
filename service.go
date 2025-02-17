@@ -14,8 +14,7 @@ type service struct {
 
 type services struct {
 	Iecs iecsService
-	//Iuop iuopService
-	//Ades adesservice
+	Iuop iuopService
 	Gts  gtsService
 	Icms icmsService
 	Icsm icsmService
