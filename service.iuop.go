@@ -8,7 +8,7 @@ import (
 type iuopService service
 
 // CreateOrder 创建物流订单
-func (s gtsService) CreateOrder(postData model.IUOPCreateOrderPost) (model.IUOPCreateOrderResp, error) {
+func (s iuopService) CreateOrder(postData model.IUOPCreateOrderPost) (model.IUOPCreateOrderResp, error) {
 	respData := model.IUOPCreateOrderResp{}
 	// 请求数据
 	resp, err := s.httpClient.R().
@@ -26,7 +26,7 @@ func (s gtsService) CreateOrder(postData model.IUOPCreateOrderPost) (model.IUOPC
 }
 
 // QueryOrder 查询物流订单
-func (s gtsService) QueryOrder(postData model.IUOPQueryOrderPost) (model.IUOPQueryOrderResp, error) {
+func (s iuopService) QueryOrder(postData model.IUOPQueryOrderPost) (model.IUOPQueryOrderResp, error) {
 	respData := model.IUOPQueryOrderResp{}
 	// 请求数据
 	resp, err := s.httpClient.R().
@@ -45,7 +45,7 @@ func (s gtsService) QueryOrder(postData model.IUOPQueryOrderPost) (model.IUOPQue
 }
 
 // PrintOrder 获取发货面单
-func (s gtsService) PrintOrder(postData model.IUOPPrintOrderPost) (model.IUOPPrintOrderResp, error) {
+func (s iuopService) PrintOrder(postData model.IUOPPrintOrderPost) (model.IUOPPrintOrderResp, error) {
 	respData := model.IUOPPrintOrderResp{}
 	// 请求数据
 	resp, err := s.httpClient.R().
@@ -64,7 +64,7 @@ func (s gtsService) PrintOrder(postData model.IUOPPrintOrderPost) (model.IUOPPri
 }
 
 // CancelOrder 取消物流订单
-func (s gtsService) CancelOrder(postData model.IUOPCancelOrderPost) (model.SFApiResponse, error) {
+func (s iuopService) CancelOrder(postData model.IUOPCancelOrderPost) (model.SFApiResponse, error) {
 	respData := model.SFApiResponse{}
 	// 请求数据
 	resp, err := s.httpClient.R().
@@ -83,7 +83,7 @@ func (s gtsService) CancelOrder(postData model.IUOPCancelOrderPost) (model.SFApi
 }
 
 // UploadCertify 上传清关资料
-func (s gtsService) UploadCertify(postData model.IUOPUploadCertifyPost) (model.SFApiResponse, error) {
+func (s iuopService) UploadCertify(postData model.IUOPUploadCertifyPost) (model.SFApiResponse, error) {
 	respData := model.SFApiResponse{}
 	// 请求数据
 	resp, err := s.httpClient.R().
@@ -102,7 +102,7 @@ func (s gtsService) UploadCertify(postData model.IUOPUploadCertifyPost) (model.S
 }
 
 // ValidityCertify 清关资料是否有效查询
-func (s gtsService) ValidityCertify(postData model.IUOPValidityCertifyPost) (model.IUOPValidityCertifyResp, error) {
+func (s iuopService) ValidityCertify(postData model.IUOPValidityCertifyPost) (model.IUOPValidityCertifyResp, error) {
 	respData := model.IUOPValidityCertifyResp{}
 	// 请求数据
 	resp, err := s.httpClient.R().
@@ -121,7 +121,7 @@ func (s gtsService) ValidityCertify(postData model.IUOPValidityCertifyPost) (mod
 }
 
 // RequireCertify 上传清关资料要求查询
-func (s gtsService) RequireCertify(postData model.IUOPRequireCertifyPost) (model.IUOPRequireCertifyResp, error) {
+func (s iuopService) RequireCertify(postData model.IUOPRequireCertifyPost) (model.IUOPRequireCertifyResp, error) {
 	respData := model.IUOPRequireCertifyResp{}
 	// 请求数据
 	resp, err := s.httpClient.R().
@@ -140,7 +140,7 @@ func (s gtsService) RequireCertify(postData model.IUOPRequireCertifyPost) (model
 }
 
 // QueryFreight 预估运费
-func (s gtsService) QueryFreight(postData model.IUOPQueryFreightPost) (model.IUOPQueryFreightResp, error) {
+func (s iuopService) QueryFreight(postData model.IUOPQueryFreightPost) (model.IUOPQueryFreightResp, error) {
 	respData := model.IUOPQueryFreightResp{}
 	// 请求数据
 	resp, err := s.httpClient.R().
@@ -159,7 +159,7 @@ func (s gtsService) QueryFreight(postData model.IUOPQueryFreightPost) (model.IUO
 }
 
 // AsynPrintOrder 异步打印面单
-func (s gtsService) AsynPrintOrder(postData model.IUOPAsynPrintOrderPost) (model.IUOPAsynPrintOrderResp, error) {
+func (s iuopService) AsynPrintOrder(postData model.IUOPAsynPrintOrderPost) (model.IUOPAsynPrintOrderResp, error) {
 	respData := model.IUOPAsynPrintOrderResp{}
 	// 请求数据
 	resp, err := s.httpClient.R().
@@ -178,7 +178,7 @@ func (s gtsService) AsynPrintOrder(postData model.IUOPAsynPrintOrderPost) (model
 }
 
 // AsynPrintResult 异步打印面单结果查询
-func (s gtsService) AsynPrintResult(postData model.IUOPAsynPrintResultPost) (model.IUOPAsynPrintResultResp, error) {
+func (s iuopService) AsynPrintResult(postData model.IUOPAsynPrintResultPost) (model.IUOPAsynPrintResultResp, error) {
 	respData := model.IUOPAsynPrintResultResp{}
 	// 请求数据
 	resp, err := s.httpClient.R().
@@ -197,7 +197,7 @@ func (s gtsService) AsynPrintResult(postData model.IUOPAsynPrintResultPost) (mod
 }
 
 // EstimateFee 预估总费用
-func (s gtsService) EstimateFee(postData model.IUOPEstimateFeePost) (model.IUOPEstimateFeeResp, error) {
+func (s iuopService) EstimateFee(postData model.IUOPEstimateFeePost) (model.IUOPEstimateFeeResp, error) {
 	respData := model.IUOPEstimateFeeResp{}
 	// 请求数据
 	resp, err := s.httpClient.R().
@@ -216,7 +216,7 @@ func (s gtsService) EstimateFee(postData model.IUOPEstimateFeePost) (model.IUOPE
 }
 
 // BbdPreMerge BBD预合单
-func (s gtsService) BbdPreMerge(postData model.IUOPBbdPreMergePost) (model.IUOPBbdPreMergeResp, error) {
+func (s iuopService) BbdPreMerge(postData model.IUOPBbdPreMergePost) (model.IUOPBbdPreMergeResp, error) {
 	respData := model.IUOPBbdPreMergeResp{}
 	// 请求数据
 	resp, err := s.httpClient.R().
@@ -235,7 +235,7 @@ func (s gtsService) BbdPreMerge(postData model.IUOPBbdPreMergePost) (model.IUOPB
 }
 
 // BbdMergeResult BBD合单结果查询
-func (s gtsService) BbdMergeResult(postData model.IUOPBbdMergeResultPost) (model.IUOPBbdMergeResultResp, error) {
+func (s iuopService) BbdMergeResult(postData model.IUOPBbdMergeResultPost) (model.IUOPBbdMergeResultResp, error) {
 	respData := model.IUOPBbdMergeResultResp{}
 	// 请求数据
 	resp, err := s.httpClient.R().
@@ -254,7 +254,7 @@ func (s gtsService) BbdMergeResult(postData model.IUOPBbdMergeResultPost) (model
 }
 
 // CancelBbdMerge 取消BBD预合单
-func (s gtsService) CancelBbdMerge(postData model.IUOPCancelBbdMergePost) (model.IUOPCancelBbdMergeResp, error) {
+func (s iuopService) CancelBbdMerge(postData model.IUOPCancelBbdMergePost) (model.IUOPCancelBbdMergeResp, error) {
 	respData := model.IUOPCancelBbdMergeResp{}
 	// 请求数据
 	resp, err := s.httpClient.R().
@@ -273,8 +273,8 @@ func (s gtsService) CancelBbdMerge(postData model.IUOPCancelBbdMergePost) (model
 }
 
 // PreOrder 预创建物流订单
-func (s gtsService) PreOrder(postData model.IUOPPreOrderPost) (model.IUOPPreOrderResp, error) {
-	respData := model.IUOPPreOrderResp{}
+func (s iuopService) PreOrder(postData model.IUOPPreOrderPost) (model.SFApiResponse, error) {
+	respData := model.SFApiResponse{}
 	// 请求数据
 	resp, err := s.httpClient.R().
 		SetBody(postData).

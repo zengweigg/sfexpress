@@ -162,11 +162,11 @@ func NewSFService(cfg config.Config) *SFClient {
 	}
 	SFClient.Services = services{
 		Iecs: (iecsService)(xService), // 出口电商业务场景
-		Iuop: (iuopService)(xService), //  国际快递业务场景接入
-		//Ades:          (adesservice)(xService),
+		Iuop: (iuopService)(xService), // 国际快递业务场景
 		Gts:  (gtsService)(xService),  // 通用查询
 		Icms: (icmsService)(xService), // 国际区划
 		Icsm: (icsmService)(xService), // 关务发票
+		//Ades: (adesservice)(xService), // 海外本地件
 	}
 	return SFClient
 }
