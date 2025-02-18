@@ -181,11 +181,11 @@ type ChildBaseInfo struct {
 }
 
 type ChildInfo struct {
-	SfWaybillNo string      `json:"sfWaybillNo,omitempty"` // 子单编号
-	Weight      float64     `json:"weight,omitempty"`      // 托寄物重量
-	Length      float64     `json:"length,omitempty"`      // 长，单位厘米
-	Width       float64     `json:"width,omitempty"`       // 宽，单位厘米
-	Height      float64     `json:"height,omitempty"`      // 高
+	SfWaybillNo null.String `json:"sfWaybillNo,omitempty"` // 子单编号
+	Weight      null.Float  `json:"weight,omitempty"`      // 托寄物重量
+	Length      null.Float  `json:"length,omitempty"`      // 长，单位厘米
+	Width       null.Float  `json:"width,omitempty"`       // 宽，单位厘米
+	Height      null.Float  `json:"height,omitempty"`      // 高
 	BoxNo       null.String `json:"boxNo,omitempty"`       // 箱号；箱号在子单集合中不能重复；如果使用箱号，请把包含母单对应的箱号全部传入
 }
 
@@ -336,7 +336,7 @@ type IUOPPrintOrderPost struct {
 
 type PrintWaybillNoDto2 struct {
 	SfWaybillNo              string   `json:"sfWaybillNo"`                        // 顺丰运单号
-	IsPrintSubParent         null.Int `json:"isPrintSubParent,omitempty"`         // 是否打印全部的子母单
+	IsPrintSubParent         null.Int `json:"isPrintSubParent,omitempty"`         // 是否打印全部的子母单 0：否 1：是 默认值：0
 	SinglePrintWaybillNoList []string `json:"singlePrintWaybillNoList,omitempty"` // 单独打印的运单号集合(含母单，子单)
 }
 
@@ -460,49 +460,125 @@ type IUOPQueryFreightResp struct {
 }
 
 // 9.异步打印面单 IUOP_ASYN_PRINT_ORDER
-type IUOPAsynPrintOrderPost struct{}
-
-type IUOPAsynPrintOrderData struct{}
+type IUOPAsynPrintOrderPost struct {
+	CustomerCode          string               `json:"customerCode"`          // 客户编码
+	RequestId             string               `json:"requestId"`             // 请求id（可使用UUID，确保请求唯一性字段，只要确保每个请求的requestId唯一即可）
+	Version               null.String          `json:"version"`               // 版本号（默认为空即可）
+	LabelModeSize         null.String          `json:"labelModeSize"`         // 面单打印样式
+	PrintType             string               `json:"printType"`             // 打印类型。1-运单 2-发票
+	PrintWaybillNoDtoList []PrintWaybillNoDto2 `json:"printWaybillNoDtoList"` // 支持批量打印 母单相同的子单（含母单） 打印参数对象
+	FileFormat            string               `json:"fileFormat"`            // 打印文件格式：PDF或者ZPL；默认为PDF
+	Resolution            string               `json:"resolution"`            // ZPL文件分辨率，支持203dpi和300dpi，仅在fileFormat为ZPL时有效
+}
 
 type IUOPAsynPrintOrderResp struct {
 	SFApiResponse
-	Data []IUOPAsynPrintOrderData `json:"data"`
+	Data struct {
+		PrintRequestId string `json:"printRequestId"`
+	} `json:"data"`
 }
 
 // 10.异步打印面单结果查询 IUOP_ASYN_PRINT_RESULT
-type IUOPAsynPrintResultPost struct{}
-
-type IUOPAsynPrintResultData struct{}
+type IUOPAsynPrintResultPost struct {
+	CustomerCode   string      `json:"customerCode"`   // 客户编码
+	RequestId      string      `json:"requestId"`      // 请求id（可使用UUID，确保请求唯一性字段，只要确保每个请求的requestId唯一即可）
+	Version        null.String `json:"version"`        // 版本号（默认为空即可）
+	PrintRequestId string      `json:"printRequestId"` // 打印请求id
+}
 
 type IUOPAsynPrintResultResp struct {
 	SFApiResponse
-	Data []IUOPAsynPrintResultData `json:"data"`
+	Data IUOPPrintOrderData `json:"data"`
 }
 
 // 11.预估总费用 IUOP_ESTIMATE_FEE
-type IUOPEstimateFeePost struct{}
+type IUOPEstimateFeePost struct {
+	CustomerCode       string            `json:"customerCode"`       // 客户编码
+	Version            null.String       `json:"version"`            // 版本号（默认为空即可）
+	InterProductCode   string            `json:"interProductCode"`   // 国际产品映射码
+	ParcelQuantity     null.Int          `json:"parcelQuantity"`     // 包裹总件数(大于1表示是子母件，最大值300)
+	ParcelTotalWeight  null.Float        `json:"parcelTotalWeight"`  // 包裹总重量。精确到小数点后2位
+	ParcelTotalLength  null.Float        `json:"parcelTotalLength"`  // 客户订单货物总长。精确到小数点后2位
+	ParcelTotalWidth   null.Float        `json:"parcelTotalWidth"`   // 客户订单货物总宽。精确到小数点后2位
+	ParcelTotalHeight  null.Float        `json:"parcelTotalHeight"`  // 客户订单货物总高。精确到小数点后2位
+	DeclaredValue      null.Float        `json:"declaredValue"`      // 总商品申报价值，单件商品申报价值*数量获取
+	DeclaredCurrency   null.String       `json:"declaredCurrency"`   // 申报价值币种
+	PaymentInfo        PaymentInfo       `json:"paymentInfo"`        // 付款方式信息
+	SenderInfo         SenderInfo3       `json:"senderInfo"`         // 寄件人信息
+	ReceiverInfo       ReceiverInfo3     `json:"receiverInfo"`       // 收件人信息
+	CustomsInfo        CustomsInfo2      `json:"customsInfo"`        // 报关信息
+	AddServiceInfoList []AddServiceInfo3 `json:"addServiceInfoList"` // 增值服务信息
+}
 
-type IUOPEstimateFeeData struct{}
+type ReceiverInfo3 struct {
+	Country      string      `json:"country"`      // 收件方国家/地区，如：CN,US,JP,KR,SG,MY 更多参考附录字典
+	PostCode     string      `json:"postCode"`     // 邮编
+	RegionFirst  null.String `json:"regionFirst"`  // 收件方地址一级区划（州/省）
+	RegionSecond null.String `json:"regionSecond"` // 收件方地址二级区划（城市）
+	RegionThird  null.String `json:"regionThird"`  // 收件方地址三级区划（区/县）
+	Address      null.String `json:"address"`      // 收件方详细地址
+	CargoType    null.Int    `json:"cargoType"`    // 收件方货物类型：1-个人件；2-公司件
+}
+
+type CustomsInfo2 struct {
+	ImportCustomsType null.String `json:"importCustomsType"` // 进口报关方式 参考附录字典
+	ExportCustomsType null.String `json:"exportCustomsType"` // 出口报关方式 参考附录字典
+}
+
+type AddServiceInfo3 struct {
+	ServiceCode string      `json:"serviceCode"` // 增值服务代码
+	Value       string      `json:"value"`       // 保价申报价值
+	ValueOne    null.String `json:"valueOne"`    // 增值服务扩展属性1
+}
+
+type IUOPEstimateFeeData struct {
+	ServiceName    string  `json:"serviceName"`    // 费用类型
+	EstimateFee    float64 `json:"estimateFee"`    // 预估费用金额
+	EstimatePayFee float64 `json:"estimatePayFee"` // 折后费用金额
+}
 
 type IUOPEstimateFeeResp struct {
 	SFApiResponse
-	Data []IUOPEstimateFeeData `json:"data"`
+	Data struct {
+		Currency         string                `json:"currency"`         // 币种
+		TotalFee         float64               `json:"totalFee"`         // 总费用
+		Weight           float64               `json:"weight"`           // 重量
+		InterProductCode string                `json:"interProductCode"` // 国际产品映射代码
+		FeeInfoList      []IUOPEstimateFeeData `json:"feeInfoList"`      // 费用信息列表
+	} `json:"data"`
 }
 
 // 12.BBD预合单 IUOP_BBD_PRE_MERGE
-type IUOPBbdPreMergePost struct{}
-
-type IUOPBbdPreMergeData struct{}
+type IUOPBbdPreMergePost struct {
+	CustomerCode string      `json:"customerCode"` // 客户编码
+	Version      null.String `json:"version"`      // 版本号（默认为空即可）
+	SfWayBillNos []string    `json:"sfWayBillNos"` // 待合运单号
+}
 
 type IUOPBbdPreMergeResp struct {
 	SFApiResponse
-	Data []IUOPBbdPreMergeData `json:"data"`
+	Data struct {
+		PreMergeSfWaybillNo string `json:"preMergeSfWaybillNo"` // 预合单号
+		PrintUrl            string `json:"printUrl"`            // 运单打印地址
+	} `json:"data"`
 }
 
 // 13.BBD合单结果查询 IUOP_BBD_MERGE_RESULT
-type IUOPBbdMergeResultPost struct{}
+type IUOPBbdMergeResultPost struct {
+	CustomerCode     string `json:"customerCode"`     // 客户编码
+	SfWaybillNo      string `json:"sfWaybillNo"`      // 顺丰运单号（母单或子单）
+	MergeSfWaybillNo string `json:"mergeSfWaybillNo"` // 合单单号（母单或子单）
+}
 
-type IUOPBbdMergeResultData struct{}
+type BBDDtoInfo struct {
+	MergeSfWaybillNo string `json:"mergeSfWaybillNo"` // 合单号（大单母单号或子单号）
+	SfWaybillNos     string `json:"sfWaybillNos"`     // 顺丰运单号（可包含多个，格式：运单号,运单号,运单号,...）
+}
+
+type IUOPBbdMergeResultData struct {
+	MergeSfWaybillNos string       `json:"mergeSfWaybillNos"` // 合单单号（可包含多个，格式：母单号,子单号,子单号...）
+	MergeRelationList []BBDDtoInfo `json:"mergeRelationList"` // 合单关系
+}
 
 type IUOPBbdMergeResultResp struct {
 	SFApiResponse
@@ -510,21 +586,140 @@ type IUOPBbdMergeResultResp struct {
 }
 
 // 14.取消BBD预合单 IUOP_CANCEL_BBD_MERGE
-type IUOPCancelBbdMergePost struct{}
-
-type IUOPCancelBbdMergeData struct{}
+type IUOPCancelBbdMergePost struct {
+	CustomerCode string   `json:"customerCode"` // 客户编码
+	SfWayBillNos []string `json:"sfWayBillNos"` // 预合单号列表
+}
 
 type IUOPCancelBbdMergeResp struct {
 	SFApiResponse
-	Data []IUOPCancelBbdMergeData `json:"data"`
+	Data bool `json:"data"`
 }
 
 // 15.预创建物流订单 IUOP_PRE_ORDER
-type IUOPPreOrderPost struct{}
+type IUOPPreOrderPost struct {
+	CustomerCode          string                 `json:"customerCode"`          // 客户编码
+	Version               null.String            `json:"version"`               // 版本号（默认为空即可）
+	OrderOperateType      null.Int               `json:"orderOperateType"`      // 订单操作类型
+	CustomerOrderNo       string                 `json:"customerOrderNo"`       // 客户订单号 （不能与历史订单号重复）
+	CustomerOrderNoTwo    null.String            `json:"customerOrderNoTwo"`    // 客户订单号2
+	SfWaybillNo           null.String            `json:"sfWaybillNo"`           // 顺丰运单号
+	InterProductCode      string                 `json:"interProductCode"`      // 国际产品映射码，即顺丰物流服务产品代码
+	ParcelQuantity        int                    `json:"parcelQuantity"`        // 包裹总件数(大于1表示是子母件，最大值300)
+	ParcelTotalWeight     null.Float             `json:"parcelTotalWeight"`     // 包裹总重量。精确到小数点后2位，默认为KG
+	ParcelWeightUnit      null.String            `json:"parcelWeightUnit"`      // 包裹总重量单位，默认KG
+	ParcelTotalLength     null.Float             `json:"parcelTotalLength"`     // 客户订单货物总长。精确到小数点后2位，默认单位CM
+	ParcelTotalWidth      null.Float             `json:"parcelTotalWidth"`      // 客户订单货物总宽。精确到小数点后2位，默认单位CM
+	ParcelTotalHeight     null.Float             `json:"parcelTotalHeight"`     // 客户订单货物总高。精确到小数点后2位，默认单位CM
+	DeclaredValue         float64                `json:"declaredValue"`         // 总商品申报价值，数值应等于ParcelInfo中所有物品的价值之和
+	DeclaredCurrency      string                 `json:"declaredCurrency"`      // 申报价值币种 ，参考附录币种声明
+	ParcelVolumeUnit      null.String            `json:"parcelVolumeUnit"`      // 客户订单货物长度单位
+	PickupType            null.String            `json:"pickupType"`            // 寄件方式
+	PickupAppointTime     null.String            `json:"pickupAppointTime"`     // 上门取件预约时间。格式：yyyy-MM-dd HH:mm
+	PickupAppointTimeZone null.String            `json:"pickupAppointTimeZone"` // 上门预约时间时区 详细参考附录字典
+	Remark                null.String            `json:"remark"`                // 运单备注
+	IsBbd                 null.String            `json:"isBbd"`                 // 是否BBD 0-不是 1-BBD单（需提前开通BBD权限）
+	OrderExtendInfo       OrderExtendInfo        `json:"orderExtendInfo"`       // 订单额外信息
+	PaymentInfo           PaymentInfo            `json:"paymentInfo"`           // 付款方式信息
+	SenderInfo            SenderInfo4            `json:"senderInfo"`            // 寄件人信息
+	ReceiverInfo          ReceiverInfo4          `json:"receiverInfo"`          // 收件人信息
+	CustomsInfo           CustomsInfo4           `json:"customsInfo"`           // 报关信息
+	ParcelInfoList        []ParcelInfo4          `json:"parcelInfoList"`        // 包裹信息
+	AddServiceInfoList    []AddServiceBaseInfo   `json:"addServiceInfoList"`    // 增值服务信息
+	ChildInfoList         []ChildInfo            `json:"childInfoList"`         // 子单信息
+	ExtendAttributeList   []OrderExtendAttribute `json:"extendAttributeList"`   // 扩展属性，具体字段见附录 扩展属性
+	EcommerceInfo         OrderEcommerceInfo     `json:"ecommerceInfo"`         // 电子商务信息
+	AgentWaybillNo        null.String            `json:"agentWaybillNo"`        // 代理运单号
+	LabelModeSize         null.Int               `json:"labelModeSize"`         // 面单打印样式；默认为1
+	IsReturnRouteLabel    null.Int               `json:"isReturnRouteLabel"`    // 是否返回路由标签
+}
 
-type IUOPPreOrderData struct{}
+type SenderInfo4 struct {
+	Company       null.String `json:"company"`       // 寄件方公司
+	Contact       string      `json:"contact"`       // 寄件方姓名
+	Country       string      `json:"country"`       // 寄件方国家/地区，如：CN,US,JP,KR,SG,MY 更多参考附录字典
+	PostCode      string      `json:"postCode"`      // 邮编
+	RegionFirst   string      `json:"regionFirst"`   // 寄件方地址一级区划（州/省）
+	RegionSecond  string      `json:"regionSecond"`  // 寄件方地址二级区划（城市）
+	RegionThird   null.String `json:"regionThird"`   // 寄件方地址三级区划（区/县）
+	Address       string      `json:"address"`       // 寄件方详细地址
+	Email         null.String `json:"email"`         // 寄件方邮箱
+	TelAreaCode   null.String `json:"telAreaCode"`   // 寄件方固定电话区号
+	TelNo         null.String `json:"telNo"`         // 寄件方固定电话。寄件方手机号和寄件方固定电话至少填写一个
+	PhoneAreaCode null.String `json:"phoneAreaCode"` // 寄件方移动电话区号
+	PhoneNo       null.String `json:"phoneNo"`       // 寄件方移动电话。寄件方手机号和寄件方固定电话至少填写一个
+	CargoType     null.Int    `json:"cargoType"`     // 寄件类型：1-个人件；2-公司件（CN/TW/KR始发必填）
+	CertType      null.String `json:"certType"`      // 寄件方证件类型 参考附录证件类型声明
+	CertCardNo    null.String `json:"certCardNo"`    // 寄件方证件号
+	Vat           null.String `json:"vat"`           // 寄件方VAT号
+	Eori          null.String `json:"eori"`          // 寄件方EORI号
+	IossNo        null.String `json:"iossNo"`        // 寄件方IOSS号
+	LvgNo         null.String `json:"lvgNo"`         // 寄件方LVG号（马来西亚进口专用，单票500RM以内，过去12个月销售额超过50万RM使用）
+}
 
-type IUOPPreOrderResp struct {
-	SFApiResponse
-	Data []IUOPPreOrderData `json:"data"`
+type ReceiverInfo4 struct {
+	Company       null.String `json:"company"`       // 收件方公司
+	Contact       string      `json:"contact"`       // 收件方姓名
+	Country       string      `json:"country"`       // 收件方国家/地区，如：CN,US,JP,KR,SG,MY 更多参考附录字典
+	PostCode      string      `json:"postCode"`      // 邮编
+	RegionFirst   string      `json:"regionFirst"`   // 收件方地址一级区划（州/省）
+	RegionSecond  string      `json:"regionSecond"`  // 收件方地址二级区划（城市）
+	RegionThird   null.String `json:"regionThird"`   // 收件方地址三级区划（区/县）
+	Address       string      `json:"address"`       // 收件方详细地址
+	RegionFifth   null.String `json:"regionFifth"`   // 收件方地址五级区划（道路名，收件方国家为韩国，则必填，长度100）
+	RegionSixth   null.String `json:"regionSixth"`   // 收件方地址六级区划（建筑编号，收件方国家为韩国，则必填）
+	Email         null.String `json:"email"`         // 收件方邮箱
+	TelAreaCode   null.String `json:"telAreaCode"`   // 收件方固定电话区号
+	TelNo         null.String `json:"telNo"`         // 收件方固定电话。收件方手机号和收件方固定电话至少填写一个
+	PhoneAreaCode null.String `json:"phoneAreaCode"` // 收件方移动电话区号
+	PhoneNo       null.String `json:"phoneNo"`       // 收件方移动电话。收件方手机号和收件方固定电话至少填写一个
+	CargoType     null.Int    `json:"cargoType"`     // 收件类型：1-个人件 2-公司件
+	CertType      null.String `json:"certType"`      // 收件方证件类型 参考附录证件类型声明 （跨境件收件国家/地区为ID,TW时必填）
+	CertCardNo    null.String `json:"certCardNo"`    // 收件方证件号 （跨境件收件国家/地区为ID,TW时必填）
+	Vat           null.String `json:"vat"`           // 收件方VAT号
+	Eori          null.String `json:"eori"`          // 收件方EORI号
+	ContactI18n   null.String `json:"contactI18n"`   // 收件方姓名（多语言）
+	AddressI18n   null.String `json:"addressI18n"`   // 收件方详细地址（多语言）
+}
+
+type CustomsInfo4 struct {
+	TradeCondition      null.String `json:"tradeCondition"`      // 贸易条件，参考附录字典
+	SenderReason        null.Int    `json:"senderReason"`        // 寄件原因：1-商业 2-非商业
+	SenderReasonContent null.String `json:"senderReasonContent"` // 寄件原因内容
+	BusinessRemark      null.String `json:"businessRemark"`      // 商业发票备注
+	CustomsBatch        null.String `json:"customsBatch"`        // 报关批次
+	ImportCustomsType   null.String `json:"importCustomsType"`   // 进口报关方式 参考附录字典
+	ExportCustomsType   null.String `json:"exportCustomsType"`   // 出口报关方式 参考附录字典
+	HarmonizedCode      null.String `json:"harmonizedCode"`      // Harmonized Code美国寄出的可填写
+	AesNo               null.String `json:"aesNo"`               // AES No.美国寄出可填写
+}
+
+type ParcelInfo4 struct {
+	Name               string      `json:"name"`               // 商品名称
+	EName              null.String `json:"eName"`              // 商品英文名称
+	Unit               string      `json:"unit"`               // 货物单位，如：个，台
+	Amount             float64     `json:"amount"`             // 单件商品申报价值
+	Quantity           float64     `json:"quantity"`           // 数量
+	OriginCountry      string      `json:"originCountry"`      // 原产国家，如：CN,US,JP,KR,SG,MY 更多参考附录字典
+	HsCode             null.String `json:"hsCode"`             // 海关编码
+	Brand              null.String `json:"brand"`              // 品牌
+	StateBarCode       null.String `json:"stateBarCode"`       // 国条码
+	ProductCustomsNo   null.String `json:"productCustomsNo"`   // 海关备案号
+	ProductRecordNo    null.String `json:"productRecordNo"`    // 货物产品国检备案编号
+	GoodsCode          null.String `json:"goodsCode"`          // 商品编号
+	GoodsUrl           null.String `json:"goodsUrl"`           // 商品链接
+	Weight             null.Float  `json:"weight"`             // 托寄物重量，单件商品SKU重量（不能小于0, 单位KG）。支持小数点后2位
+	GoodsDesc          null.String `json:"goodsDesc"`          // 商品描述
+	Material           null.String `json:"material"`           // 材质
+	Specifications     null.String `json:"specifications"`     // 型号
+	ItemNo             null.String `json:"itemNo"`             // 商品序号
+	QtyOne             null.Float  `json:"qtyOne"`             // 法定第一数量
+	UnitOne            null.String `json:"unitOne"`            // 法定第一计量单位
+	QtyTwo             null.Float  `json:"qtyTwo"`             // 法定第二数量
+	UnitTwo            null.String `json:"unitTwo"`            // 法定第二计量单位
+	HtsCode            null.String `json:"htsCode"`            // 海关编码(美国)
+	HtsDesc            null.String `json:"htsDesc"`            // 海关编码描述
+	Eccn               null.String `json:"eccn"`               // 出口管制号码
+	ProductNameElement null.String `json:"productNameElement"` // 品名申报要素，支持多个要素，要素名使用“[]”标记，多要素使用“;”分隔
+	SellerVatNumber    null.String `json:"sellerVatNumber"`    // 税号
 }

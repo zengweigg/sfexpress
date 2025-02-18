@@ -37,18 +37,22 @@ type IECSCreateOrderPost struct {
 	InputDirectionCode null.String  `json:"inputDirectionCode"` // 29. 合同物流部分产品指定流向代码
 }
 
-type SenderInfo struct {
-	Company      string      `json:"company"`      // 1. 寄件方公司 (必填)
-	Contact      string      `json:"contact"`      // 2. 寄件方姓名 (必填)
+type SenderInfoBase struct {
 	Country      string      `json:"country"`      // 3. 寄件方国家/地区，如：CN,US,JP,KR,SG,MY 更多参考附录字典 (必填)
 	PostCode     string      `json:"postCode"`     // 4. 邮编 (必填)
-	RegionFirst  string      `json:"regionFirst"`  // 5. 寄件方地址一级区划（州/省） (必填)
-	RegionSecond string      `json:"regionSecond"` // 6. 寄件方地址二级区划（城市） (必填)
+	RegionFirst  null.String `json:"regionFirst"`  // 5. 寄件方地址一级区划（州/省） (必填)
+	RegionSecond null.String `json:"regionSecond"` // 6. 寄件方地址二级区划（城市） (必填)
 	RegionThird  null.String `json:"regionThird"`  // 7. 寄件方地址三级区划（区/县） (非必填)
-	Address      string      `json:"address"`      // 8. 寄件方详细地址 (必填)
-	TelNo        string      `json:"telNo"`        // 9. 寄件方固定电话。寄件方手机号和寄件方固定电话至少填写一个 (必填)
-	PhoneNo      string      `json:"phoneNo"`      // 10. 寄件方移动电话。寄件方手机号和寄件方固定电话至少填写一个 (必填)
-	Email        null.String `json:"email"`        // 11. 寄件方邮箱 (非必填)
+	Address      null.String `json:"address"`      // 8. 寄件方详细地址 (必填)
+}
+
+type SenderInfo struct {
+	SenderInfoBase
+	Company string      `json:"company"` // 1. 寄件方公司 (必填)
+	Contact string      `json:"contact"` // 2. 寄件方姓名 (必填)
+	TelNo   string      `json:"telNo"`   // 9. 寄件方固定电话。寄件方手机号和寄件方固定电话至少填写一个 (必填)
+	PhoneNo string      `json:"phoneNo"` // 10. 寄件方移动电话。寄件方手机号和寄件方固定电话至少填写一个 (必填)
+	Email   null.String `json:"email"`   // 11. 寄件方邮箱 (非必填)
 }
 
 type SenderInfo2 struct {
@@ -61,6 +65,11 @@ type SenderInfo2 struct {
 	Vat           string `json:"vat"`           // 寄件方VAT号
 	Eori          string `json:"eori"`          // 寄件方EORI号
 	IossNo        string `json:"iossNo"`        // 寄件方IOSS号
+}
+
+type SenderInfo3 struct {
+	SenderInfoBase
+	CargoType null.Int `json:"cargoType"` // 寄件方货物类型：1-个人件；2-公司件
 }
 
 type ReceiverInfo struct {
